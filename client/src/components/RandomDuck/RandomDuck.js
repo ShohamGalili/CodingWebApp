@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import styles from './RandomDuck.module.css';
-import { DuckContext } from '../../context/DuckContext';
+import { DuckContext } from '../../context/CodeBlockContext';
 import FirstButton from '../common/FirstButton/FirstButton';
 
 const RandomDuck = () => {

@@ -1,19 +1,35 @@
 /* App.module.css */
+:root {
+  --primary-bg-color: #f5f5f5; /* Light gray background */
+  --header-footer-bg: #2C3E50; /* Dark blue for header/footer */
+  --accent-color: #3498DB; /* Accent soft blue */
+  --hover-color: #2ECC71; /* Hover effect color */
+  --text-color: #333; /* Dark gray text */
+}
+
 .app {
   text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--primary-bg-color); /* Light background for a modern feel */
 }
 
 .appHeader {
-  background-color: #53474F;
-  padding: 5px 30px 5px 30px;
+  background-color: var(--header-footer-bg);
+  padding: 20px;
   color: white;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
 }
 
-.appLogo {
-  height: 100px;
+.appTitle {
+  font-size: 2.5em;
+  color: white;
+  margin: 0;
+  font-family: 'Roboto', sans-serif; /* Use modern font */
 }
 
 .appNav {
@@ -25,25 +41,55 @@
   color: white;
   text-decoration: none;
   font-size: 1.2em;
+  font-weight: bold;
 }
 
 .appLink:hover {
   text-decoration: underline;
+  color: var(--hover-color); /* Change to green on hover */
 }
 
 .main {
-  padding: 20px;
-  background-color: #FFDCE8;
-  height: 100vh;
+  flex-grow: 1;
+  padding: 50px;
+  background-color: var(--primary-bg-color);
 }
 
 .footer {
-  padding: 10px;
-  background-color: #53474F;
+  padding: 15px;
+  background-color: var(--header-footer-bg);
   color: white;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
   text-align: center;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  font-size: 0.9em;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); /* Footer shadow */
 }
-  
+
+/* Modern button styles */
+button {
+  background-color: var(--accent-color);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--hover-color);
+}
+
+/* For a more modern look on inputs */
+input[type="text"], textarea {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1em;
+  width: 100%;
+  margin-bottom: 15px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,19 @@
+/* CodeEditor.css */
+
+.editorContainer {
+    width: 50%;  /* Make the editor narrower (50% width of the parent container) */
+    margin: 0 auto;  /* Center the editor horizontally */
+    direction: ltr;  /* Ensure left-to-right text direction */
+}
+
+.CodeMirror {
+    height: auto;  /* Adjust height automatically */
+    min-height: 600px;  /* Ensure a minimum height */
+    font-size: 1rem;  /* Control the font size */
+    border: 1px solid #ccc;  /* Add a border around the editor */
+    border-radius: 4px;  /* Slightly round the corners */
+    padding: 10px;  /* Add padding inside the editor */
+    background-color: #f9f9f9;  /* Light background for better readability */
+    direction: ltr;  /* Ensure text starts from left-to-right inside the editor */
+    text-align: left;  /* Align text to the left */
+}

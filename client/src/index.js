@@ -1,14 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './styles/global.css'; 
+import './styles/global.css';
 import App from './App';
-import { DuckProvider } from './context/DuckContext';
+import { CodeBlockProvider } from './context/CodeBlockContext';  // Updated context
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <DuckProvider>
-      <App /> 
-    </DuckProvider>
-  </React.StrictMode>
+    <CodeBlockProvider>
+        <App />
+    </CodeBlockProvider>
 );
