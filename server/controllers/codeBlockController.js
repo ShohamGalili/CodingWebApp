@@ -25,7 +25,6 @@ const getCodeBlock = async (req, res) => {
 };
 
 // Create a new code block
-// Create a new code block
 const createCodeBlock = async (req, res) => {
     const { title, description, initialTemplate, solutionCode } = req.body;
     try {
@@ -52,7 +51,6 @@ const createCodeBlock = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
-
 
 // Delete a code block
 const deleteCodeBlock = async (req, res) => {

@@ -6,7 +6,7 @@ const User = require('./models/UserModel');  // Import User model
 const CodeBlock = require('./models/CodeBlockModel');  // Import CodeBlock model
 const http = require('http');
 const { Server } = require('socket.io');
-
+const { ObjectId } = require('mongodb');
 dotenv.config();
 
 // Constants
@@ -40,11 +40,11 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 // Add user to MongoDB (create if it doesn't exist)
 const addUserToDB = async (socketId, codeBlockId, role) => {
     try {
-        let user = await User.findOne({ userId: socketId });
-
+        let user = await User.findOne({ socketId });
         // If user doesn't exist, create a new one
         if (!user) {
             user = new User({
+                socketId,
                 currentCodeBlockId: codeBlockId,
                 solvedCodeBlocks: []
             });
@@ -80,7 +80,6 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// Add a new code block to the database
 // Add a new code block to the database
 app.post('/api/codeblocks', async (req, res) => {
     try {

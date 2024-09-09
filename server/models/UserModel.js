@@ -2,17 +2,17 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        auto: true,
+    socketId: {
+        type: String,
+        required: true,
     },
     currentCodeBlockId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'CodeBlock',
         required: true,
     },
     solvedCodeBlocks: [{
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'CodeBlock'
     }]
 });

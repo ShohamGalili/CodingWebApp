@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const codeBlockSchema = new Schema({
-    codeblockId: {
-        type: Schema.Types.ObjectId,
+    socketId: {
+        type: String,
         auto: true,  // Automatically generated ID for each code block
     },
     title: {
@@ -40,5 +40,5 @@ const codeBlockSchema = new Schema({
     }
 });
 
-const CodeBlock = mongoose.model('CodeBlock', codeBlockSchema);
+const CodeBlock = mongoose.model('CodeBlock', codeBlockSchema, 'CodeBlocks');
 module.exports = CodeBlock;
