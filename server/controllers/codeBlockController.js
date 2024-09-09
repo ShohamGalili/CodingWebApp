@@ -25,15 +25,34 @@ const getCodeBlock = async (req, res) => {
 };
 
 // Create a new code block
+// Create a new code block
 const createCodeBlock = async (req, res) => {
-    const { title, description, initialCode, solutionCode } = req.body;
+    const { title, description, initialTemplate, solutionCode } = req.body;
     try {
-        const codeBlock = await CodeBlock.create({ title, description, initialCode, solutionCode });
-        res.status(201).json(codeBlock);
+        // Create a new CodeBlock instance with the given data
+        const newCodeBlock = new CodeBlock({
+            title,                             // Code block title
+            description,                       // Code block description
+            initialTemplate,                   // Initial code template
+            solution: solutionCode,            // Solution code for the block
+            currentContent: initialTemplate,   // Set the initial content to the template
+            usersOfCodeBlock: []               // Empty array for users, initially
+        });
+
+        // Save the new code block (MongoDB automatically generates ObjectId)
+        await newCodeBlock.save();
+
+        // Send the ObjectId and a success message back to the frontend
+        res.status(201).json({
+            _id: newCodeBlock._id,  // MongoDB generated ObjectId
+            message: 'Code block created successfully'
+        });
     } catch (error) {
+        // If an error occurs, send a 400 status with the error message
         res.status(400).json({ error: error.message });
     }
 };
+
 
 // Delete a code block
 const deleteCodeBlock = async (req, res) => {

@@ -1,0 +1,19 @@
+/* CodeMirror customization */
+.CodeMirror {
+    width: 100%;  /* Set the width to 80% of the parent */
+    margin: 20px auto;  /* Center the editor and add margin */
+    height: auto;  /* Let the height adjust automatically */
+    max-height: 400px;  /* Adjust the height of the editor */
+    font-size: 1rem;  /* Control the font size */
+    background-color: #2e2e2e;  /* Dark background */
+    color: white;  /* White text */
+    border: none;  /* Remove any inner borders */
+    padding: 10px;  /* Add padding inside the editor */
+    overflow-y: auto;  /* Allow vertical scrolling */
+    box-shadow: none;  /* Remove shadow */
+}
+
+/* Remove the scrollbars */
+.CodeMirror-scroll {
+    overflow: hidden !important;  /* Hide scrollbars */
+}

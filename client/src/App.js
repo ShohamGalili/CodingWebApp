@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Lobby from './components/Lobby';  // Import Lobby component
 import CodeBlock from './components/CodeBlock';  // Import CodeBlock component
 import styles from './styles/App.module.css';  // Import styles
 
 function App() {
+
   return (
       <BrowserRouter>
         <div className={styles.app}>

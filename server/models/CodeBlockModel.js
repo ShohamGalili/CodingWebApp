@@ -1,24 +1,44 @@
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
 const codeBlockSchema = new Schema({
+    codeblockId: {
+        type: Schema.Types.ObjectId,
+        auto: true,  // Automatically generated ID for each code block
+    },
     title: {
         type: String,
-        required: true
+        required: true,  // Code block title (e.g., 'Async case', 'Promise example')
     },
-    description: {
+    initialTemplate: {
         type: String,
-        required: true
+        required: true,  // Initial template for the code block
     },
-    initialCode: {
+    solution: {
         type: String,
-        required: true  // Code block starting template
+        required: true,  // Solution to the code block
     },
-    solutionCode: {
-        type: String,
-        required: true  // Solution code for this block
+    currentContent: {
+        type: String,  // The current content of the code block (updated in real-time)
+    },
+    usersOfCodeBlock: [
+        {
+            userId: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',  // Reference to the user on this code block
+            },
+            role: {
+                type: String,
+                enum: ['mentor', 'student'],  // Role: 'mentor' or 'student'
+                required: true,
+            },
+        }
+    ],
+    isMentorPresent: {
+        type: Boolean,
+        default: false  // Boolean indicating whether the mentor is present
     }
-}, { timestamps: true });
+});
 
-module.exports = mongoose.model('CodeBlock', codeBlockSchema);
+const CodeBlock = mongoose.model('CodeBlock', codeBlockSchema);
+module.exports = CodeBlock;

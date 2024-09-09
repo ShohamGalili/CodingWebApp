@@ -4,6 +4,10 @@
     width: 50%;  /* Make the editor narrower (50% width of the parent container) */
     margin: 0 auto;  /* Center the editor horizontally */
     direction: ltr;  /* Ensure left-to-right text direction */
+    height: calc(100vh - 200px); /* Calculate height dynamically to prevent overflow */
+    overflow-y: auto; /* Allow vertical scrolling within the editor if content exceeds height */
+    max-height: calc(100vh - 200px); /* Prevent the editor from exceeding the screen height */
+    box-sizing: border-box;
 }
 
 .CodeMirror {
@@ -16,4 +20,13 @@
     background-color: #f9f9f9;  /* Light background for better readability */
     direction: ltr;  /* Ensure text starts from left-to-right inside the editor */
     text-align: left;  /* Align text to the left */
+    overflow-x: hidden !important;
+}
+
+.CodeMirror-scroll {
+    overflow-y: auto !important; /* Allow vertical scrolling if needed */
+    overflow-x: hidden !important; /* Hide horizontal scrolling */}
+
+.CodeMirror-lines {
+    white-space: pre-wrap !important; /* Force the text to wrap to avoid horizontal scrolling */
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Lobby.css';
 
@@ -11,6 +11,11 @@ const codeBlocks = [
 
 function Lobby() {
     const navigate = useNavigate();
+
+    // Set the document title when the Lobby component is rendered
+    useEffect(() => {
+        document.title = 'Lobby - Coding Web App';  // Set the title to "Lobby"
+    }, []);
 
     const handleCodeBlockClick = (id, title) => {
         navigate(`/codeblock/${id}`, { state: { title } });  // Pass title via state

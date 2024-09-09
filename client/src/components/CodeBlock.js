@@ -1,45 +1,52 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import CodeEditor from './CodeEditor';
 import StudentCounter from './StudentCounter';
 import SmileyFace from './SmileyFace';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { socket } from '../services/socketService';
 
 function CodeBlock() {
     const { id } = useParams();
-    const location = useLocation();  // Get location object
+    const navigate = useNavigate();
+    const location = useLocation();
     const [code, setCode] = useState('');
     const [role, setRole] = useState('student');
     const [students, setStudents] = useState(0);
     const [solution, setSolution] = useState('// solution code here');
     const [isSolved, setIsSolved] = useState(false);
-    const navigate = useNavigate();
 
     useEffect(() => {
-        // Join the code block
         socket.emit('joinCodeBlock', id);
 
-        // Listen for the assigned role from the server
-        socket.on('role', (assignedRole) => {
-            setRole(assignedRole);  // Set the role to either 'mentor' or 'student'
+        // Update the document title based on the code block title
+        document.title = `Code Block ${id} - ${location.state?.title || 'Unknown Title'}`;
+
+        socket.on('role', (role) => {
+            setRole(role);
         });
 
-        // Listen for code updates
+        // Update the code editor when a new code update is received
         socket.on('codeUpdate', (newCode) => {
             setCode(newCode);
         });
 
-        // Listen for student count updates
         socket.on('studentCount', (count) => {
             setStudents(count);
         });
 
-        // If the mentor leaves, navigate back to the lobby
+        // Listen for the mentorLeft event and redirect to the lobby
         socket.on('mentorLeft', () => {
-            navigate('/');
+            console.log('Mentor left the code block, redirecting to the lobby...');
+            setCode('');  // Clear the code
+            navigate('/lobby');  // Redirect to the lobby page
         });
 
+        // Clean up when the component unmounts or the user navigates away
         return () => {
+            // Emit mentorLeft if the user is a mentor and leaving the page
+            if (role === 'mentor') {
+                socket.emit('mentorLeft', id);  // Notify server that mentor is leaving the code block
+            }
             socket.emit('leaveCodeBlock', id);
         };
     }, [id, navigate]);
@@ -54,12 +61,13 @@ function CodeBlock() {
 
     return (
         <div>
-            <h1>Code Block {id} - {location.state?.title || 'Unknown Title'}</h1>
-            <h3>Role: {role === 'mentor' ? 'Mentor' : 'Student'}</h3>  {/* Show user role */}
-            <StudentCounter count={students} />
-            <CodeEditor code={code} onChange={handleCodeChange} readOnly={role === 'mentor'} />
-            {isSolved && <SmileyFace />}
+            <h1 style={{marginTop: '0x'}}>Code Block {id} - {location.state?.title || 'Unknown Title'}</h1>
+            <h3 style={{marginTop: '10px'}}>Role: {role}</h3>
+            <StudentCounter count={students}/>
+            <CodeEditor code={code} onChange={handleCodeChange} readOnly={role === 'mentor'}/>
+            {isSolved && <SmileyFace/>}
         </div>
+
     );
 }
 
