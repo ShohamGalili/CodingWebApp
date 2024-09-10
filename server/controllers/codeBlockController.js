@@ -26,24 +26,27 @@ const getCodeBlock = async (req, res) => {
 
 // Create a new code block
 const createCodeBlock = async (req, res) => {
-    const { title, description, initialTemplate, solutionCode } = req.body;
+    const { title, initialTemplate, solutionCode } = req.body; // Ensure these fields come from the frontend
     try {
+        // Generate a random socketId (you can also use UUID or other unique string methods)
+        const socketId = generateUniqueSocketId();  // You would define this function to generate unique IDs
+
         // Create a new CodeBlock instance with the given data
         const newCodeBlock = new CodeBlock({
+            socketId,                          // Use the generated socketId
             title,                             // Code block title
-            description,                       // Code block description
             initialTemplate,                   // Initial code template
             solution: solutionCode,            // Solution code for the block
             currentContent: initialTemplate,   // Set the initial content to the template
             usersOfCodeBlock: []               // Empty array for users, initially
         });
 
-        // Save the new code block (MongoDB automatically generates ObjectId)
+        // Save the new code block (MongoDB will use socketId instead of _id)
         await newCodeBlock.save();
 
-        // Send the ObjectId and a success message back to the frontend
+        // Send the socketId and a success message back to the frontend
         res.status(201).json({
-            _id: newCodeBlock._id,  // MongoDB generated ObjectId
+            socketId: newCodeBlock.socketId,
             message: 'Code block created successfully'
         });
     } catch (error) {
@@ -51,6 +54,13 @@ const createCodeBlock = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+// Helper function to generate a unique socketId (you can use any strategy here)
+const generateUniqueSocketId = () => {
+    // For example, using a simple date-based string, but it's recommended to use something like UUID
+    return `socket_${new Date().getTime()}`;
+};
+
 
 // Delete a code block
 const deleteCodeBlock = async (req, res) => {

@@ -23,8 +23,8 @@ const codeBlockSchema = new Schema({
     },
     usersOfCodeBlock: [
         {
-            userId: {
-                type: Schema.Types.ObjectId,
+            socketIdUser: {
+                type: String,
                 ref: 'User',  // Reference to the user on this code block
             },
             role: {

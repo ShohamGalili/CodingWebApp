@@ -37,7 +37,7 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Add a user to a code block with a role
+// Add user to code block with a role
 router.post('/:id/addUser', async (req, res) => {
     try {
         const codeBlockId = req.params.id;
@@ -61,5 +61,6 @@ router.post('/:id/addUser', async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
 
 module.exports = router;

@@ -6,7 +6,6 @@ const User = require('./models/UserModel');  // Import User model
 const CodeBlock = require('./models/CodeBlockModel');  // Import CodeBlock model
 const http = require('http');
 const { Server } = require('socket.io');
-const { ObjectId } = require('mongodb');
 dotenv.config();
 
 // Constants
@@ -28,12 +27,62 @@ app.use((req, res, next) => {
 });
 
 // ################################################ DB & HTTP ########################################################
+
+// Define the initial code blocks for seeding
+const initialCodeBlocks = [
+    {
+        title: 'Async case',
+        initialTemplate: '// async function example',
+        solution: 'async function example() { /* solution here */ }',
+        currentContent: '// async function example',
+    },
+    {
+        title: 'Promise example',
+        initialTemplate: '// promise example code here',
+        solution: 'function promiseExample() { return new Promise((resolve, reject) => {/* solution here */}) }',
+        currentContent: '// promise example code here',
+    },
+    {
+        title: 'Closures',
+        initialTemplate: '// closure example',
+        solution: 'function closureExample() { /* solution here */ }',
+        currentContent: '// closure example',
+    },
+    {
+        title: 'Event Loop',
+        initialTemplate: '// event loop example',
+        solution: 'setTimeout(() => { /* solution here */ }, 0);',
+        currentContent: '// event loop example',
+    },
+];
+
+// Seeding function
+const seedInitialCodeBlocks = async () => {
+    try {
+        const count = await CodeBlock.countDocuments();
+
+        if (count === 0) {
+            console.log('No code blocks found. Seeding initial data...');
+            await CodeBlock.insertMany(initialCodeBlocks);
+            console.log('Initial code blocks have been seeded.');
+        } else {
+            console.log('Code blocks already exist. Skipping seeding.');
+        }
+    } catch (error) {
+        console.error('Error seeding initial code blocks:', error);
+    }
+};
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
+        seedInitialCodeBlocks();  // Seed the initial code blocks
+        server.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
     })
-    .catch(err => {
+    .catch((err) => {
         console.error('Failed to connect to MongoDB:', err);
     });
 
@@ -41,7 +90,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 const addUserToDB = async (socketId, codeBlockId, role) => {
     try {
         let user = await User.findOne({ socketId });
-        // If user doesn't exist, create a new one
         if (!user) {
             user = new User({
                 socketId,
@@ -50,7 +98,6 @@ const addUserToDB = async (socketId, codeBlockId, role) => {
             });
             await user.save();
         } else {
-            // If user exists, update their current code block
             user.currentCodeBlockId = codeBlockId;
             await user.save();
         }
@@ -61,6 +108,33 @@ const addUserToDB = async (socketId, codeBlockId, role) => {
     }
 };
 
+// Add a code block to MongoDB (create if it doesn't exist)
+const addCodeBlockToDB = async (socketId, title, initialTemplate, solution) => {
+    try {
+        let codeBlock = await CodeBlock.findOne({ socketId });
+
+        if (!codeBlock) {
+            codeBlock = new CodeBlock({
+                socketId,
+                title,
+                initialTemplate,
+                solution,
+                currentContent: initialTemplate,
+                usersOfCodeBlock: [],
+                isMentorPresent: false
+            });
+            await codeBlock.save();
+            console.log(`Code block with socketId ${socketId} created successfully`);
+        } else {
+            console.log(`Code block with socketId ${socketId} already exists`);
+        }
+
+        return codeBlock;
+    } catch (error) {
+        console.error('Error adding code block to database:', error);
+        throw new Error(error);
+    }
+};
 
 // Create a new user and add them to a code block (API route)
 app.post('/api/users', async (req, res) => {
@@ -168,7 +242,6 @@ const io = new Server(server, {
 });
 // ################################################ DB & HTTP ########################################################
 
-
 // Store users in each code block (code block ID => list of users)
 const codeBlockUsers = {};
 
@@ -180,63 +253,81 @@ io.on('connection', (socket) => {
     socket.on('joinCodeBlock', async (blockId) => {
         console.log(`User ${socket.id} is trying to join code block ${blockId}`);
 
+        // Initialize the code block in memory if it doesn't exist
         if (!codeBlockUsers[blockId]) {
             codeBlockUsers[blockId] = [];
         }
 
+        // Assign role: the first user is 'mentor', others are 'student'
+        const role = codeBlockUsers[blockId].length === 0 ? 'mentor' : 'student';
+
+        // Add the user to the in-memory object (codeBlockUsers)
+        codeBlockUsers[blockId].push({ socketId: socket.id, role });
+
+        // Update MongoDB CodeBlock document by pushing the new user to usersOfCodeBlock
+        await CodeBlock.findByIdAndUpdate(
+             CodeBlock.socketId,
+            { $push: { usersOfCodeBlock: { socketIdUser: socket.id, role } } },  // Push user to the usersOfCodeBlock array
+            { new: true }  // Return the updated document
+        );
+
+
+
         // Log current users in the code block
         console.log(`Current users in code block ${blockId}:`, codeBlockUsers[blockId]);
-
-        // Assign role: first user = mentor, subsequent users = students
-        let role = 'student';  // Default to student
-        if (codeBlockUsers[blockId].length === 0) {
-            role = 'mentor';  // First user becomes mentor
-            console.log(`User ${socket.id} is the first in the block and is assigned as mentor`);
-        } else {
-            console.log(`User ${socket.id} is assigned as a student`);
-        }
-
-        codeBlockUsers[blockId].push({ socketId: socket.id, role });
 
         // Add the user to the MongoDB Users collection
         await addUserToDB(socket.id, blockId, role);
 
-        // Join the code block room
+        // Call the seeding function for initial code blocks (if required)
+        await seedInitialCodeBlocks();
+
+        // Join the user to the Socket.io room for the code block
         socket.join(blockId);
 
-        // Send the role to the user
+        // Send the assigned role to the user (mentor or student)
         socket.emit('role', role);
 
-        // Emit only the student count (excluding the mentor)
+        // Emit the student count (excluding the mentor) to all clients in the block
         const studentCount = codeBlockUsers[blockId].filter(user => user.role === 'student').length;
         io.to(blockId).emit('studentCount', studentCount);
 
         // Handle real-time code updates
         socket.on('codeUpdate', (newCode) => {
-            io.to(blockId).emit('codeUpdate', newCode);  // Broadcast the updated code to all users in the block
+            io.to(blockId).emit('codeUpdate', newCode);  // Broadcast updated code to all users
         });
 
         // Handle user disconnection
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             console.log(`User ${socket.id} disconnected from block ${blockId}`);
 
-            // Remove user from the code block
+            // Remove the user from the in-memory object (codeBlockUsers)
             codeBlockUsers[blockId] = codeBlockUsers[blockId].filter(user => user.socketId !== socket.id);
 
-            // If the mentor leaves, reset the code block and notify students
+            // If the mentor leaves, notify students and reset the code block
             if (role === 'mentor') {
                 console.log(`Mentor ${socket.id} left the code block`);
-                io.to(blockId).emit('mentorLeft');  // Notify all students the mentor has left
-                codeBlockUsers[blockId] = [];  // Clear the code block for new users
+                io.to(blockId).emit('mentorLeft');  // Notify all students that the mentor has left
+
+                // Clear the code block for new users
+                codeBlockUsers[blockId] = [];
+
+                // Update MongoDB to reflect that the mentor has left and reset the users
+                await CodeBlock.findByIdAndUpdate(
+                    CodeBlock.socketId,
+                    { isMentorPresent: false, usersOfCodeBlock: [] }  // Reset users and mentor presence
+                );
+            } else {
+                // Remove the user from MongoDB CodeBlock usersOfCodeBlock array
+                await CodeBlock.findByIdAndUpdate(
+                    CodeBlock.socketId,
+                    { $pull: { usersOfCodeBlock: { socketIdUser: socket.id } } }  // Remove the user from the block
+                );
             }
 
-            // Update student count for everyone in the block
-            io.to(blockId).emit('studentCount', codeBlockUsers[blockId].length);
+            // Update student count for all users in the block
+            const studentCount = codeBlockUsers[blockId].filter(user => user.role === 'student').length;
+            io.to(blockId).emit('studentCount', studentCount);
         });
     });
-});
-
-// Start the server
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });
