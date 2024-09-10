@@ -64,7 +64,7 @@ const initialCodeBlocks = [
 
 
 // Seeding function
-const seedInitialCodeBlocks = async () => {
+/*const seedInitialCodeBlocks = async () => {
     try {
         const count = await CodeBlock.countDocuments();
 
@@ -78,7 +78,25 @@ const seedInitialCodeBlocks = async () => {
     } catch (error) {
         console.error('Error seeding initial code blocks:', error);
     }
+};*/
+
+// Seeding function
+const seedInitialCodeBlocks = async () => {
+    try {
+        console.log('Resetting the CodeBlocks collection...');
+
+        // Delete all existing code blocks
+        await CodeBlock.deleteMany({});
+        console.log('All existing code blocks have been deleted.');
+
+        // Insert the initial code blocks
+        await CodeBlock.insertMany(initialCodeBlocks);
+        console.log('Initial code blocks have been seeded.');
+    } catch (error) {
+        console.error('Error resetting and seeding code blocks:', error);
+    }
 };
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -92,6 +110,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     .catch((err) => {
         console.error('Failed to connect to MongoDB:', err);
     });
+
 
 // Add user to MongoDB (create if it doesn't exist)
 const addUserToDB = async (socketId, codeBlockId, role) => {
@@ -200,7 +219,7 @@ app.put('/api/codeblocks/:id', async (req, res) => {
             return res.status(404).json({ error: 'Code block not found' });
         }
 
-        res.json(codeBlock);
+        res.status(201).json(codeBlock);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching code block' });
     }
@@ -231,11 +250,10 @@ app.post('/api/codeblocks/:id/addUser', async (req, res) => {
     }
 });
 
-// Get all code blocks
 app.get('/api/codeblocks', async (req, res) => {
     try {
-        const codeBlocks = await CodeBlock.find();
-        res.status(200).json(codeBlocks);
+        const codeBlocks = await CodeBlock.find();  // שליפת כל ה-CodeBlocks
+        res.status(200).json(codeBlocks);  // החזרת כל ה-CodeBlocks במערך
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -292,9 +310,6 @@ io.on('connection', (socket) => {
         // Add the user to the MongoDB Users collection
         await addUserToDB(socket.id, blockId, role);
 
-        // Call the seeding function for initial code blocks (if required)
-        await seedInitialCodeBlocks();
-
         // Join the user to the Socket.io room for the code block
         socket.join(blockId);
 
@@ -332,14 +347,14 @@ io.on('connection', (socket) => {
                 codeBlockUsers[blockId] = [];
 
                 // Update MongoDB to reflect that the mentor has left and reset the users
-                await CodeBlock.findByIdAndUpdate(
-                    CodeBlock.socketId,
+                await CodeBlock.findOneAndUpdate(
+                    {blockId},
                     { isMentorPresent: false, usersOfCodeBlock: [] }  // Reset users and mentor presence
                 );
             } else {
                 // Remove the user from MongoDB CodeBlock usersOfCodeBlock array
-                await CodeBlock.findByIdAndUpdate(
-                    CodeBlock.socketId,
+                await CodeBlock.findOneAndUpdate(
+                    {blockId},
                     { $pull: { usersOfCodeBlock: { socketIdUser: socket.id } } }  // Remove the user from the block
                 );
             }
@@ -347,6 +362,24 @@ io.on('connection', (socket) => {
             // Update student count for all users in the block
             const studentCount = codeBlockUsers[blockId].filter(user => user.role === 'student').length;
             io.to(blockId).emit('studentCount', studentCount);
+        });
+
+        socket.on('mentorLeaveCodeBlock', async (blockId) => {
+            console.log(`Mentor ${socket.id} has chosen to leave the code block ${blockId}`);
+
+            // Emit 'mentorLeft' to all clients in the block, redirecting them to the lobby
+            io.to(blockId).emit('mentorLeft');  // Notify all students that the mentor has left
+
+            // Clear the code block for new users (reset the users of the code block)
+            codeBlockUsers[blockId] = [];
+
+            // Update MongoDB to reflect that the mentor has left and reset the users
+            await CodeBlock.findOneAndUpdate(
+                { blockId },
+                { isMentorPresent: false, usersOfCodeBlock: [] }  // Reset users and mentor presence
+            );
+
+            console.log(`All students in block ${blockId} were redirected to the lobby.`);
         });
     });
 });

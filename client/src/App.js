@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Lobby from './components/Lobby';  // Import Lobby component
 import CodeBlock from './components/CodeBlock';  // Import CodeBlock component
+import AddCodeBlock from './components/AddCodeBlock';  // Import AddCodeBlock component
 import styles from './styles/App.module.css';  // Import styles
 
 function App() {
-
   return (
       <BrowserRouter>
         <div className={styles.app}>
@@ -13,6 +13,7 @@ function App() {
             <h1 className={styles.appTitle}>Coding Web App</h1>
             <nav className={styles.appNav}>
               <Link to="/lobby" className={styles.appLink}>Lobby</Link>
+              <Link to="/add-codeblock" className={styles.appLink}>Add New Code Block</Link> {/* New Link */}
             </nav>
           </header>
           <main className={styles.main}>
@@ -20,6 +21,7 @@ function App() {
               <Route path="/" element={<Lobby />} /> {/* Set Lobby as the main page */}
               <Route path="/lobby" element={<Lobby />} />  {/* Route to Lobby */}
               <Route path="/codeblock/:id" element={<CodeBlock />} />  {/* Route to individual CodeBlock */}
+              <Route path="/add-codeblock" element={<AddCodeBlock />} /> {/* Route to Add CodeBlock form */}
             </Routes>
           </main>
           <footer className={styles.footer}>
