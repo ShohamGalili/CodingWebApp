@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const codeBlockSchema = new Schema({
+    blockId: {
+        type: String,
+    },
     socketId: {
         type: String,
-        auto: true,  // Automatically generated ID for each code block
     },
     title: {
         type: String,
@@ -33,11 +35,7 @@ const codeBlockSchema = new Schema({
                 required: true,
             },
         }
-    ],
-    isMentorPresent: {
-        type: Boolean,
-        default: false  // Boolean indicating whether the mentor is present
-    }
+    ]
 });
 
 const CodeBlock = mongoose.model('CodeBlock', codeBlockSchema, 'CodeBlocks');

@@ -16,48 +16,58 @@ function CodeBlock() {
     const [isSolved, setIsSolved] = useState(false);
 
     useEffect(() => {
+        // Fetch the code block data, including currentContent and initialTemplate
+        fetch(`/api/codeblocks/${id}`)
+            .then((response) => response.json())
+            .then((data) => {
+                const initialContent = data.currentContent || data.initialTemplate;
+                console.log('Fetched initial content:', initialContent);
+                setCode(initialContent);  // Set either currentContent or initialTemplate
+                setSolution(data.solution);
+            })
+            .catch((error) => console.error('Error fetching code block:', error));
+
+        // Join the socket room for real-time updates
         socket.emit('joinCodeBlock', id);
 
-        // Update the document title based on the code block title
-        document.title = `Code Block ${id} - ${location.state?.title || 'Unknown Title'}`;
-
-        socket.on('role', (role) => {
-            setRole(role);
+        // Listen for the role assignment from the server
+        socket.on('role', (assignedRole) => {
+            setRole(assignedRole);
         });
 
-        // Update the code editor when a new code update is received
-        socket.on('codeUpdate', (newCode) => {
-            setCode(newCode);
+        // Listen for code updates from other students/mentors
+        socket.on('codeUpdate', (updatedCode) => {
+            setCode(updatedCode);  // Update the code in real-time
         });
 
+        // Listen for student count updates
         socket.on('studentCount', (count) => {
             setStudents(count);
         });
 
-        // Listen for the mentorLeft event and redirect to the lobby
+        // Handle mentor leaving the room
         socket.on('mentorLeft', () => {
-            console.log('Mentor left the code block, redirecting to the lobby...');
-            setCode('');  // Clear the code
-            navigate('/lobby');  // Redirect to the lobby page
+            navigate('/lobby');
         });
 
-        // Clean up when the component unmounts or the user navigates away
         return () => {
-            // Emit mentorLeft if the user is a mentor and leaving the page
-            if (role === 'mentor') {
-                socket.emit('mentorLeft', id);  // Notify server that mentor is leaving the code block
-            }
             socket.emit('leaveCodeBlock', id);
         };
     }, [id, navigate]);
 
+
     const handleCodeChange = (newCode) => {
         setCode(newCode);
         socket.emit('codeUpdate', newCode);
-        if (newCode === solution) {
-            setIsSolved(true);
+
+        // Check if the code matches the solution
+        if (newCode.trim() === solution.trim()) {
+            setIsSolved(true);  // Show the smiley face if the solution is correct
+        } else {
+            setIsSolved(false); // Reset the smiley face if the code is incorrect
         }
     };
+
 
     return (
         <div>

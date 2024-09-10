@@ -27,34 +27,41 @@ app.use((req, res, next) => {
 });
 
 // ################################################ DB & HTTP ########################################################
-
-// Define the initial code blocks for seeding
 const initialCodeBlocks = [
     {
+        blockId: '1',  // מזהה מחרוזת פשוטה
         title: 'Async case',
         initialTemplate: '// async function example',
         solution: 'async function example() { /* solution here */ }',
         currentContent: '// async function example',
+        isMentorPresent: false,
     },
     {
+        blockId: '2',  // מזהה מחרוזת פשוטה
         title: 'Promise example',
         initialTemplate: '// promise example code here',
         solution: 'function promiseExample() { return new Promise((resolve, reject) => {/* solution here */}) }',
         currentContent: '// promise example code here',
+        isMentorPresent: false,
     },
     {
+        blockId: '3',  // מזהה מחרוזת פשוטה
         title: 'Closures',
         initialTemplate: '// closure example',
         solution: 'function closureExample() { /* solution here */ }',
         currentContent: '// closure example',
+        isMentorPresent: false,
     },
     {
+        blockId: '4',  // מזהה מחרוזת פשוטה
         title: 'Event Loop',
         initialTemplate: '// event loop example',
         solution: 'setTimeout(() => { /* solution here */ }, 0);',
         currentContent: '// event loop example',
+        isMentorPresent: false,
     },
 ];
+
 
 // Seeding function
 const seedInitialCodeBlocks = async () => {
@@ -115,7 +122,7 @@ const addCodeBlockToDB = async (socketId, title, initialTemplate, solution) => {
 
         if (!codeBlock) {
             codeBlock = new CodeBlock({
-                socketId,
+                blockId,
                 title,
                 initialTemplate,
                 solution,
@@ -160,6 +167,7 @@ app.post('/api/codeblocks', async (req, res) => {
         const { title, initialTemplate, solution } = req.body;
 
         const newCodeBlock = new CodeBlock({
+            blockId,
             title,
             initialTemplate,
             solution,
@@ -182,8 +190,8 @@ app.put('/api/codeblocks/:id', async (req, res) => {
         const codeBlockId = req.params.id;
         const { currentContent } = req.body;
 
-        const codeBlock = await CodeBlock.findByIdAndUpdate(
-            codeBlockId,
+        const codeBlock = await CodeBlock.findByOneAndUpdate(
+            {codeBlockId},
             { currentContent },
             { new: true }
         );
@@ -192,9 +200,9 @@ app.put('/api/codeblocks/:id', async (req, res) => {
             return res.status(404).json({ error: 'Code block not found' });
         }
 
-        res.status(200).json(codeBlock);
+        res.json(codeBlock);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: 'Error fetching code block' });
     }
 });
 
@@ -253,6 +261,12 @@ io.on('connection', (socket) => {
     socket.on('joinCodeBlock', async (blockId) => {
         console.log(`User ${socket.id} is trying to join code block ${blockId}`);
 
+        // Fetch the current content from MongoDB
+        const codeBlock = await CodeBlock.findOne({ blockId });
+        if (codeBlock) {
+            socket.emit('codeUpdate', codeBlock.currentContent); // Send the current content to the newly joined client
+        }
+
         // Initialize the code block in memory if it doesn't exist
         if (!codeBlockUsers[blockId]) {
             codeBlockUsers[blockId] = [];
@@ -265,12 +279,11 @@ io.on('connection', (socket) => {
         codeBlockUsers[blockId].push({ socketId: socket.id, role });
 
         // Update MongoDB CodeBlock document by pushing the new user to usersOfCodeBlock
-        await CodeBlock.findByIdAndUpdate(
-             CodeBlock.socketId,
-            { $push: { usersOfCodeBlock: { socketIdUser: socket.id, role } } },  // Push user to the usersOfCodeBlock array
-            { new: true }  // Return the updated document
+        await CodeBlock.findOneAndUpdate(
+            { blockId },
+            { $push: { usersOfCodeBlock: { socketIdUser: socket.id, role } } },  // הוספת המשתמש למערך usersOfCodeBlock
+            { new: true }  // החזרת המסמך המעודכן
         );
-
 
 
         // Log current users in the code block
@@ -293,8 +306,14 @@ io.on('connection', (socket) => {
         io.to(blockId).emit('studentCount', studentCount);
 
         // Handle real-time code updates
-        socket.on('codeUpdate', (newCode) => {
-            io.to(blockId).emit('codeUpdate', newCode);  // Broadcast updated code to all users
+        socket.on('codeUpdate', async (newCode) => {
+            io.to(blockId).emit('codeUpdate', newCode); // Broadcast updated code to all users
+
+            // Update currentContent in MongoDB
+            await CodeBlock.findOneAndUpdate(
+                { blockId },
+                { currentContent: newCode }
+            );
         });
 
         // Handle user disconnection
