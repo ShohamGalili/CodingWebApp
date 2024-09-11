@@ -80,6 +80,12 @@ You can access the live version of the **Coding Web App** here:
 
 [Live Demo](https://codingwebapp.vercel.app/)
 
+## Video Explanation
+
+You can watch a video explanation of the **Coding Web App** here:
+
+[Watch Video](https://youtu.be/0YK0-spltvM)
+
 ---
 
 Hope you enjoy using **Coding Web App**!
