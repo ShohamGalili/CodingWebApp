@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import Lobby from './components/Lobby';  // Import Lobby component
-import CodeBlock from './components/CodeBlock';  // Import CodeBlock component
+import Lobby from './components/Lobby';
+import CodeBlock from './components/CodeBlock';
 import { Typography, AppBar, Toolbar, Button, Box, Container, Switch } from '@mui/material';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
 function App() {
-    const [showBackground, setShowBackground] = useState(true); // State to toggle background
+    const [showBackground, setShowBackground] = useState(true); // State to toggle background visibility
 
     return (
         <BrowserRouter>
             <Box
                 sx={{
-                    minHeight: '100vh',  // Ensure the minimum height is 100% of the viewport
+                    minHeight: '100vh',
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
@@ -26,7 +26,7 @@ function App() {
                             top: 0,
                             left: 0,
                             width: '100%',
-                            height: '100vh', // Ensure the background covers the full height
+                            height: '100vh',
                             backgroundImage: 'url("/back_pic/tech_pic.jpg")',
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
@@ -37,7 +37,7 @@ function App() {
                     />
                 )}
 
-                {/* Toolbar */}
+                {/* Top Toolbar */}
                 <AppBar position="static" sx={{ backgroundColor: '#6cbfd8' }}>
                     <Container maxWidth="xl">
                         <Toolbar disableGutters>
@@ -87,7 +87,7 @@ function App() {
                     </Container>
                 </AppBar>
 
-                {/* Routing */}
+                {/* Main content with routing */}
                 <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'rgba(255, 255, 255, 0)' }}>
                     <Routes>
                         <Route path="/" element={<Lobby />} />
@@ -107,15 +107,15 @@ function App() {
                         backgroundColor: '#6cbfd8',
                         width: '100%',
                         boxSizing: 'border-box',
-                        zIndex: 1  // Make sure the toolbar is above the background
+                        zIndex: 1,
                     }}
                 >
                     <Toolbar
                         sx={{
                             display: 'flex',
                             justifyContent: 'center',
-                            padding: '0.3px 0', // Reduce padding to make it thinner
-                            minHeight: '40px', // Optionally, set a minimum height
+                            padding: '0.3px 0', // Reduce padding for a slimmer bottom bar
+                            minHeight: '40px', // Set a minimum height for the bottom bar
                         }}
                     >
                         <Typography

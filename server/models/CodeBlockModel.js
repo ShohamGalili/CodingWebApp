@@ -10,28 +10,28 @@ const codeBlockSchema = new Schema({
     },
     title: {
         type: String,
-        required: true,  // Code block title (e.g., 'Async case', 'Promise example')
+        required: true,  // Code block title
     },
     initialTemplate: {
         type: String,
-        required: true,  // Initial template for the code block
+        required: true,  // Initial code template for the block
     },
     solution: {
         type: String,
-        required: true,  // Solution to the code block
+        required: true,  // Correct solution to the block
     },
     currentContent: {
-        type: String,  // The current content of the code block (updated in real-time)
+        type: String,  // The current code content, updated in real-time
     },
     usersOfCodeBlock: [
         {
             socketIdUser: {
                 type: String,
-                ref: 'User',  // Reference to the user on this code block
+                ref: 'User',  // Reference to the user
             },
             role: {
                 type: String,
-                enum: ['mentor', 'student'],  // Role: 'mentor' or 'student'
+                enum: ['mentor', 'student'],  // Role of the user in the session
                 required: true,
             },
         }

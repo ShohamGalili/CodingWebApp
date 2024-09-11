@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import api from '../services/api';  // Ensure this is your correct API handler
+import api from '../services/api';
 
 // Create the context
 const CodeBlockContext = createContext();
@@ -12,23 +12,23 @@ const CodeBlockProvider = ({ children }) => {
     // Fetch all code blocks from the API
     const getCodeBlocks = async () => {
         try {
-            const response = await api.get('/codeblocks');  // Make sure the endpoint is correct
-            setCodeBlocks(response.data); // Set the fetched code blocks
+            const response = await api.get('/codeblocks');
+            setCodeBlocks(response.data);
         } catch (error) {
-            console.error('Error fetching code blocks:', error); // Log any errors
+            console.error('Error fetching code blocks:', error);
         }
     };
 
     // Select a specific code block by ID
     const selectCodeBlock = (id) => {
-        const block = codeBlocks.find(block => block.blockId === id); // Ensure you use `blockId` instead of `id` if that's your field
-        setSelectedCodeBlock(block); // Set the selected block
+        const block = codeBlocks.find(block => block.blockId === id); // Use `blockId` to find the block
+        setSelectedCodeBlock(block);
     };
 
     // Fetch code blocks when the component is mounted
     useEffect(() => {
-        getCodeBlocks();  // Call the function to fetch blocks when the provider mounts
-    }, []); // The empty dependency array ensures this runs once on mount
+        getCodeBlocks();
+    }, []); // Run once on mount
 
     return (
         <CodeBlockContext.Provider value={{ codeBlocks, selectedCodeBlock, selectCodeBlock }}>

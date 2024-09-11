@@ -8,16 +8,17 @@ import GroupIcon from '@mui/icons-material/Group';
 import WorkIcon from '@mui/icons-material/Work';
 
 function CodeBlock() {
-    const { id } = useParams();
+    const { id } = useParams();  // Get the code block ID from the URL
     const navigate = useNavigate();
     const location = useLocation();
-    const [code, setCode] = useState('');
-    const [role, setRole] = useState('student');
-    const [students, setStudents] = useState(0);
-    const [solution, setSolution] = useState('// solution code here');
-    const [isSolved, setIsSolved] = useState(false);
+    const [code, setCode] = useState('');  // Holds the current code content
+    const [role, setRole] = useState('student');  // User's role in the session
+    const [students, setStudents] = useState(0);  // Number of students in the room
+    const [solution, setSolution] = useState('// solution code here');  // Holds the correct solution
+    const [isSolved, setIsSolved] = useState(false);  // Checks if the problem is solved
 
     useEffect(() => {
+        // Fetch the selected code block data by ID
         fetch(`http://localhost:5000/api/codeblocks`)
             .then((response) => response.json())
             .then((data) => {
@@ -25,41 +26,54 @@ function CodeBlock() {
 
                 if (selectedBlock) {
                     const initialContent = selectedBlock.currentContent || selectedBlock.initialTemplate;
-                    setCode(initialContent);
-                    setSolution(selectedBlock.solution);
+                    setCode(initialContent);  // Set the code editor's initial content
+                    setSolution(selectedBlock.solution);  // Set the solution to validate against
+
+                    // Set the document's title to the code block's title
+                    document.title = `Code Block - ${selectedBlock.title}`;
                 } else {
                     console.error('Block not found');
+                    document.title = 'Code Block - Not Found';  // If block is not found
                 }
             })
             .catch((error) => console.error('Error fetching code block:', error));
 
+        // Join the code block room via socket
         socket.emit('joinCodeBlock', id);
 
+        // Listen for role assignment
         socket.on('role', (assignedRole) => {
             setRole(assignedRole);
         });
 
+        // Listen for code updates from other users in the session
         socket.on('codeUpdate', (updatedCode) => {
             setCode(updatedCode);
         });
 
+        // Track the number of students in the session
         socket.on('studentCount', (count) => {
             setStudents(count);
         });
 
+        // Handle mentor leaving the session
         socket.on('mentorLeft', () => {
             navigate('/lobby');
         });
 
+        // Cleanup when leaving the code block
         return () => {
-            socket.emit('leaveCodeBlock', id);
+            socket.emit('leaveCodeBlock', id);  // Leave the room on component unmount
         };
     }, [id, navigate]);
 
+
+    // Handle code changes and emit updated code to others
     const handleCodeChange = (newCode) => {
         setCode(newCode);
         socket.emit('codeUpdate', newCode);
 
+        // Check if the code matches the solution
         if (newCode.trim() === solution.trim()) {
             setIsSolved(true);
         } else {
@@ -200,7 +214,7 @@ function CodeBlock() {
                                                 fontWeight: 'bold',
                                             }}
                                             onClick={() => {
-                                                socket.emit('mentorLeaveCodeBlock', id);
+                                                socket.emit('mentorLeaveCodeBlock', id);  // Notify server when mentor leaves
                                                 navigate('/lobby');
                                             }}
                                         >

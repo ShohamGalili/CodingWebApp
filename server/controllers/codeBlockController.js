@@ -26,41 +26,37 @@ const getCodeBlock = async (req, res) => {
 
 // Create a new code block
 const createCodeBlock = async (req, res) => {
-    const { title, initialTemplate, solutionCode } = req.body; // Ensure these fields come from the frontend
+    const { title, initialTemplate, solutionCode } = req.body;
     try {
-        // Generate a random socketId (you can also use UUID or other unique string methods)
-        const socketId = generateUniqueSocketId();  // You would define this function to generate unique IDs
+        // Generate a unique socketId for the code block
+        const socketId = generateUniqueSocketId();
 
-        // Create a new CodeBlock instance with the given data
+        // Create and save the new CodeBlock instance
         const newCodeBlock = new CodeBlock({
-            socketId,                          // Use the generated socketId
-            title,                             // Code block title
-            initialTemplate,                   // Initial code template
-            solution: solutionCode,            // Solution code for the block
-            currentContent: initialTemplate,   // Set the initial content to the template
-            usersOfCodeBlock: []               // Empty array for users, initially
+            socketId,
+            title,
+            initialTemplate,
+            solution: solutionCode,
+            currentContent: initialTemplate,
+            usersOfCodeBlock: []
         });
 
-        // Save the new code block (MongoDB will use socketId instead of _id)
         await newCodeBlock.save();
 
-        // Send the socketId and a success message back to the frontend
+        // Respond with the created socketId and a success message
         res.status(201).json({
             socketId: newCodeBlock.socketId,
             message: 'Code block created successfully'
         });
     } catch (error) {
-        // If an error occurs, send a 400 status with the error message
         res.status(400).json({ error: error.message });
     }
 };
 
-// Helper function to generate a unique socketId (you can use any strategy here)
+// Helper function to generate a unique socketId
 const generateUniqueSocketId = () => {
-    // For example, using a simple date-based string, but it's recommended to use something like UUID
-    return `socket_${new Date().getTime()}`;
+    return `socket_${new Date().getTime()}`;  // Simple timestamp-based ID generator
 };
-
 
 // Delete a code block
 const deleteCodeBlock = async (req, res) => {

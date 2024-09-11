@@ -1,6 +1,6 @@
 const initialCodeBlocks = [
     {
-        blockId: '1',  // מזהה מחרוזת פשוטה
+        blockId: '1',  // Unique string identifier for the code block
         title: 'Async case',
         initialTemplate: `// Async Function Example:
     // Fetching data from an API using fetch with async/await.
@@ -25,7 +25,7 @@ const initialCodeBlocks = [
     }`,
     },
     {
-        blockId: '2',  // Simple string identifier
+        blockId: '2',
         title: 'Promise Example',
         initialTemplate: `// Promise Example: Fetching data from an API using Promises
 
@@ -55,10 +55,9 @@ function fetchData() {
 }
 
 fetchData();`,
-
     },
     {
-        blockId: '3',  // Simple string identifier
+        blockId: '3',
         title: 'Closures',
         initialTemplate: `// Closure Example: Creating a private counter using a closure
 
@@ -100,11 +99,9 @@ const counter = createCounter();  // Create a new counter
 
 counter();  // Output: Current count: 1
 counter();  // Output: Current count: 2`,
-
-
     },
     {
-        blockId: '4',  // Simple string identifier
+        blockId: '4',
         title: 'Event Loop',
         initialTemplate: `// Event Loop Example: Demonstrating event loop behavior with setTimeout
 
@@ -141,7 +138,6 @@ function demonstrateEventLoop() {
 }
 
 demonstrateEventLoop();`,
-
     },
 ];
 
