@@ -78,7 +78,7 @@ Before you begin, make sure you have the following installed on your system:
 
 You can access the live version of the **Coding Web App** here:
 
-[Live Demo](https://coding-web-owr5h8d2n-shoham-galilis-projects.vercel.app/)
+[Live Demo](https://codingwebapp.vercel.app/)
 
 ---
 
