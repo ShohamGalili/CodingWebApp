@@ -1,5 +1,4 @@
 # Coding Web App
----
 
 Welcome to **Coding Web App**, an interactive platform designed to enhance collaborative coding in real-time! This application allows mentors and students to work together on coding challenges, share code blocks, and solve problems in a dynamic and engaging environment.
 
