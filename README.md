@@ -74,6 +74,11 @@ Before you begin, make sure you have the following installed on your system:
 - **Mentor and Student Roles**: Mentors guide students by reviewing their code in real-time and offering feedback. Students can submit their code for review once completed.
 - **Real-Time Collaboration**: Edits made by any user in a session will be visible to all other participants immediately.
 
+## Live Demo
+
+You can access the live version of the **Coding Web App** here:
+
+[Live Demo](https://coding-web-owr5h8d2n-shoham-galilis-projects.vercel.app/)
 ---
 
 Hope you enjoy using **Coding Web App**!
