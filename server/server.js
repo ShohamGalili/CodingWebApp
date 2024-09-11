@@ -6,6 +6,8 @@ const User = require('./models/UserModel');  // Import User model
 const CodeBlock = require('./models/CodeBlockModel');  // Import CodeBlock model
 const http = require('http');
 const { Server } = require('socket.io');
+const initialCodeBlocks = require('./initialCodeBlocks');
+
 dotenv.config();
 
 // Constants
@@ -27,59 +29,6 @@ app.use((req, res, next) => {
 });
 
 // ################################################ DB & HTTP ########################################################
-const initialCodeBlocks = [
-    {
-        blockId: '1',  // מזהה מחרוזת פשוטה
-        title: 'Async case',
-        initialTemplate: '// async function example',
-        solution: 'async function example() { /* solution here */ }',
-        currentContent: '// async function example',
-        isMentorPresent: false,
-    },
-    {
-        blockId: '2',  // מזהה מחרוזת פשוטה
-        title: 'Promise example',
-        initialTemplate: '// promise example code here',
-        solution: 'function promiseExample() { return new Promise((resolve, reject) => {/* solution here */}) }',
-        currentContent: '// promise example code here',
-        isMentorPresent: false,
-    },
-    {
-        blockId: '3',  // מזהה מחרוזת פשוטה
-        title: 'Closures',
-        initialTemplate: '// closure example',
-        solution: 'function closureExample() { /* solution here */ }',
-        currentContent: '// closure example',
-        isMentorPresent: false,
-    },
-    {
-        blockId: '4',  // מזהה מחרוזת פשוטה
-        title: 'Event Loop',
-        initialTemplate: '// event loop example',
-        solution: 'setTimeout(() => { /* solution here */ }, 0);',
-        currentContent: '// event loop example',
-        isMentorPresent: false,
-    },
-];
-
-
-// Seeding function
-/*const seedInitialCodeBlocks = async () => {
-    try {
-        const count = await CodeBlock.countDocuments();
-
-        if (count === 0) {
-            console.log('No code blocks found. Seeding initial data...');
-            await CodeBlock.insertMany(initialCodeBlocks);
-            console.log('Initial code blocks have been seeded.');
-        } else {
-            console.log('Code blocks already exist. Skipping seeding.');
-        }
-    } catch (error) {
-        console.error('Error seeding initial code blocks:', error);
-    }
-};*/
-
 // Seeding function
 const seedInitialCodeBlocks = async () => {
     try {
@@ -349,7 +298,7 @@ io.on('connection', (socket) => {
                 // Update MongoDB to reflect that the mentor has left and reset the users
                 await CodeBlock.findOneAndUpdate(
                     {blockId},
-                    { isMentorPresent: false, usersOfCodeBlock: [] }  // Reset users and mentor presence
+                    { isMentorPresent: false, usersOfCodeBlock: [], currentContent: initialCodeBlocks.find(block => block.blockId === blockId).initialTemplate }  // Reset users and mentor presence
                 );
             } else {
                 // Remove the user from MongoDB CodeBlock usersOfCodeBlock array
@@ -376,8 +325,10 @@ io.on('connection', (socket) => {
             // Update MongoDB to reflect that the mentor has left and reset the users
             await CodeBlock.findOneAndUpdate(
                 { blockId },
-                { isMentorPresent: false, usersOfCodeBlock: [] }  // Reset users and mentor presence
-            );
+                { isMentorPresent: false, usersOfCodeBlock: [] ,  // Reset users and mentor presence
+                        currentContent: initialCodeBlocks.find(block => block.blockId === blockId).initialTemplate } // Reset to the initial template
+
+        );
 
             console.log(`All students in block ${blockId} were redirected to the lobby.`);
         });

@@ -1,35 +1,141 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Lobby from './components/Lobby';  // Import Lobby component
 import CodeBlock from './components/CodeBlock';  // Import CodeBlock component
-import AddCodeBlock from './components/AddCodeBlock';  // Import AddCodeBlock component
-import styles from './styles/App.module.css';  // Import styles
+import { Typography, AppBar, Toolbar, Button, Box, Container, Switch } from '@mui/material';
+import TerminalIcon from '@mui/icons-material/Terminal';
 
 function App() {
-  return (
-      <BrowserRouter>
-        <div className={styles.app}>
-          <header className={styles.appHeader}>
-            <h1 className={styles.appTitle}>Coding Web App</h1>
-            <nav className={styles.appNav}>
-              <Link to="/lobby" className={styles.appLink}>Lobby</Link>
-              <Link to="/add-codeblock" className={styles.appLink}>Add New Code Block</Link> {/* New Link */}
-            </nav>
-          </header>
-          <main className={styles.main}>
-            <Routes>
-              <Route path="/" element={<Lobby />} /> {/* Set Lobby as the main page */}
-              <Route path="/lobby" element={<Lobby />} />  {/* Route to Lobby */}
-              <Route path="/codeblock/:id" element={<CodeBlock />} />  {/* Route to individual CodeBlock */}
-              <Route path="/add-codeblock" element={<AddCodeBlock />} /> {/* Route to Add CodeBlock form */}
-            </Routes>
-          </main>
-          <footer className={styles.footer}>
-            <p>&copy; 2024 Coding Web App</p>
-          </footer>
-        </div>
-      </BrowserRouter>
-  );
+    const [showBackground, setShowBackground] = useState(true); // State to toggle background
+
+    return (
+        <BrowserRouter>
+            <Box
+                sx={{
+                    minHeight: '100vh',  // Ensure the minimum height is 100% of the viewport
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                }}
+            >
+                {/* Background image */}
+                {showBackground && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100vh', // Ensure the background covers the full height
+                            backgroundImage: 'url("/back_pic/tech_pic.jpg")',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                            zIndex: -1,
+                            opacity: 0.6,
+                        }}
+                    />
+                )}
+
+                {/* Toolbar */}
+                <AppBar position="static" sx={{ backgroundColor: '#6cbfd8' }}>
+                    <Container maxWidth="xl">
+                        <Toolbar disableGutters>
+                            <TerminalIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, color: 'white' }} />
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component={Link}
+                                to="/"
+                                sx={{
+                                    mr: 2,
+                                    display: { xs: 'none', md: 'flex' },
+                                    fontFamily: 'monospace',
+                                    fontWeight: 700,
+                                    letterSpacing: '.3rem',
+                                    color: 'white',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                Coding Web App
+                            </Typography>
+
+                            <Box sx={{ flexGrow: 1 }} />
+
+                            {/* Toggle Background Button */}
+                            <Switch
+                                checked={showBackground}
+                                onChange={() => setShowBackground(!showBackground)}
+                                color="default"
+                                inputProps={{ 'aria-label': 'toggle background' }}
+                            />
+
+                            <Button
+                                component={Link}
+                                to="/lobby"
+                                variant="outlined"
+                                sx={{
+                                    my: 2,
+                                    color: 'white',
+                                    borderColor: 'white',
+                                    display: 'block',
+                                }}
+                            >
+                                Lobby
+                            </Button>
+                        </Toolbar>
+                    </Container>
+                </AppBar>
+
+                {/* Routing */}
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'rgba(255, 255, 255, 0)' }}>
+                    <Routes>
+                        <Route path="/" element={<Lobby />} />
+                        <Route path="/lobby" element={<Lobby />} />
+                        <Route path="/codeblock/:id" element={<CodeBlock />} />
+                    </Routes>
+                </Box>
+
+                {/* Bottom Toolbar */}
+                <AppBar
+                    position="fixed"
+                    sx={{
+                        top: 'auto',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        backgroundColor: '#6cbfd8',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        zIndex: 1  // Make sure the toolbar is above the background
+                    }}
+                >
+                    <Toolbar
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            padding: '0.3px 0', // Reduce padding to make it thinner
+                            minHeight: '40px', // Optionally, set a minimum height
+                        }}
+                    >
+                        <Typography
+                            variant="body2"
+                            noWrap
+                            sx={{
+                                fontFamily: 'monospace',
+                                fontWeight: 700,
+                                color: 'inherit',
+                                textDecoration: 'none',
+                            }}
+                        >
+                            &copy; 2024 Coding Web App
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+
+            </Box>
+        </BrowserRouter>
+    );
 }
 
 export default App;
