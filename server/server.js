@@ -7,6 +7,7 @@ const CodeBlock = require('./models/CodeBlockModel');
 const http = require('http');
 const { Server } = require('socket.io');
 const initialCodeBlocks = require('./initialCodeBlocks');
+const path = require('path');
 
 dotenv.config();
 
@@ -296,4 +297,10 @@ io.on('connection', (socket) => {
             );
         });
     });
+})
+
+// טיפול בקבצים סטטיים (React)
+app.use(express.static(path.join(__dirname, '../client/build')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
