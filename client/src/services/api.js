@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Create an instance of Axios with default configurations
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,  //####### NEED TO BE CHANGED FOR LOCALHOST ########
-  //baseURL: 'https://codingwebapp-pfyd.onrender.com',  // Make sure this points to the correct API
+  //baseURL: process.env.REACT_APP_API_URL,  //####### NEED TO BE CHANGED FOR LOCALHOST ########
+  baseURL: 'https://codingwebapp-pfyd.onrender.com',  // Make sure this points to the correct API
   headers: {
     'Content-Type': 'application/json',
   },
