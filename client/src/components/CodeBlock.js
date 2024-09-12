@@ -19,7 +19,7 @@ function CodeBlock() {
 
     useEffect(() => {
         // Fetch the selected code block data by ID
-        fetch(`https://codingwebapp.vercel.app/api/codeblocks`)
+        fetch(`https://codingwebapp-pfyd.onrender.com/api/codeblocks`)
         //fetch(`http://localhost:5000/api/codeblocks`)
             .then((response) => response.json())
             .then((data) => {
