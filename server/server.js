@@ -189,11 +189,11 @@ app.get('/api/codeblocks', async (req, res) => {
 });
 
 // Initialize Socket.io
-const io = new Server(server, {
+const io = require('socket.io')(server, {
     cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
-    }
+        origin: 'https://codingwebapp-pfyd.onrender.com',
+        methods: ['GET', 'POST'],
+    },
 });
 
 // ################################################ DB & HTTP ########################################################
