@@ -5,6 +5,7 @@ import CodeBlock from './components/CodeBlock';
 import { Typography, AppBar, Toolbar, Button, Box, Container, Switch } from '@mui/material';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
+
 function App() {
     const [showBackground, setShowBackground] = useState(true); // State to toggle background visibility
 

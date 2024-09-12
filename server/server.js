@@ -9,6 +9,7 @@ const { Server } = require('socket.io');
 const initialCodeBlocks = require('./initialCodeBlocks');
 const path = require('path');
 
+
 dotenv.config();
 
 // Constants
@@ -18,7 +19,7 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 const server = http.createServer(app);
 
-// Middleware
+// Middlewar
 app.use(express.json());
 app.use(cors({
     origin: process.env.CLIENT_URL
