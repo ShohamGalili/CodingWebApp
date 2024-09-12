@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an instance of Axios with default configurations
 const axiosInstance = axios.create({
-  baseURL: 'https://codingwebapp-pfyd.onrender.com/api',  // Make sure this points to the correct API
+  baseURL: 'https://codingwebapp-pfyd.onrender.com',  // Make sure this points to the correct API
   headers: {
     'Content-Type': 'application/json',
   },
