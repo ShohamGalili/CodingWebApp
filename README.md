@@ -62,6 +62,26 @@ Before you begin, make sure you have the following installed on your system:
     ```
    The client should open in your default browser at http://localhost:3000.
 
+## Local vs Deploy Configurations
+
+There are places in the code that allow switching between localhost for local development and the deployed version. For example, in the .env file of both the client and server, you will find the following configurations:
+
+1. **For Local Development:**
+   In local development, you will use localhost for both the client and server URLs.
+   ```bash
+    ####### FOR LOCALHOST ########
+    CLIENT_URL=http://localhost:3000
+    API_URL=http://localhost:5000/api
+    ```
+2. **For Deployed Version:**
+   When deploying the app, switch to the deployed URL. Here's an example of how the .env variables should be set up for deployment.
+   ```bash
+    ####### FOR DEPLOY ########
+    #CLIENT_URL=https://codingwebapp-pfyd.onrender.com
+    API_URL=https://codingwebapp-pfyd.onrender.com/api
+    ```
+   You can easily toggle between local and deployed versions by commenting or uncommenting the respective lines in the .env file.
+
 ## Folder Structure
 
 - `client/`: Contains the frontend of the application built with React. This includes the UI for the lobby, code block pages, and real-time collaboration features.
@@ -91,8 +111,3 @@ You can watch a video explanation of the **Coding Web App** here:
 Hope you enjoy using **Coding Web App**!
 
 Made with ❤️ by Shoham Galili
-
-
-
-
-
