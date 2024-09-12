@@ -19,8 +19,8 @@ function CodeBlock() {
 
     useEffect(() => {
         // Fetch the selected code block data by ID
-        fetch(`https://codingwebapp-pfyd.onrender.com/api/codeblocks`)
-        //fetch(`http://localhost:5000/api/codeblocks`)
+        //fetch(`https://codingwebapp-pfyd.onrender.com/api/codeblocks`)//####### FOR DEPLOY ########
+        fetch(`http://localhost:5000/api/codeblocks`) //####### FOR LOCALHOST ########
             .then((response) => response.json())
             .then((data) => {
                 const selectedBlock = data.find(block => block.blockId === id);
